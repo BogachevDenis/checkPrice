@@ -3,28 +3,25 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/checkPrice/pkg/adhandler"
 	log "github.com/sirupsen/logrus"
 )
+
+
 var db *sql.DB
 
-type Ad struct{
-	Id		int
-	Number		string
-	Price	string
-}
-
-func Connect (pg_host, pg_port, pg_user, pg_pass, pg_base string ) error {
+func Connect (pg_user, pg_pass, pg_base string ) error {
 	var err error
-	db, err = sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",pg_host, pg_port, pg_user, pg_pass, pg_base))
+	db, err = sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@postgres/%s?sslmode=disable", pg_user, pg_pass, pg_base))
 	if err != nil {
-		fmt.Println("errOpen",err.Error())
-		return err
+		log.Fatal(err)
 	}
+
 	return nil
 }
 
 func IsEmailExists(email string) bool {
-	r := db.QueryRow(`SELECT "id" FROM "users" WHERE "email" = $1`, email)
+	r := db.QueryRow(`SELECT "id" FROM "users" WHERE "email" = $1 AND activation = true `, email)
 	var id int
 	err := r.Scan(&id)
 	if err == sql.ErrNoRows {
@@ -34,90 +31,67 @@ func IsEmailExists(email string) bool {
 }
 
 func InsertData(email, number, price, key string) error {
-	userId, err := getEmailId(email, key)
+	err := insertEmail(email, key)
 	if err != nil{
 		return err
 	}
-	fmt.Println("emailid =", userId)
-	numberId, err := getAdId(number, price)
+	err = insertAd(number, price)
 	if err != nil{
 		return err
 	}
-	fmt.Println("numberid =", numberId)
-	subId, err := getSubId(userId, numberId)
+
+	err = insertSub(email, number)
 	if err != nil{
 		return err
 	}
-	fmt.Println("subId =", subId)
 	return nil
 }
 
 
 
-func getEmailId(email, key string) (int, error) {
-	r := db.QueryRow(`SELECT "id" FROM "users" WHERE "email" = $1`, email)
-	var id int
-	err := r.Scan(&id)
-	if err == sql.ErrNoRows {
-		k := db.QueryRow(`INSERT INTO users (email, key) VALUES ($1, $2) returning id`, email, key)
-		err := k.Scan(&id)
+func insertEmail(email, key string) error {
+	_, err := db.Exec(`INSERT INTO users (email, key) VALUES ($1, $2)`, email, key)
+	if err != nil {
+		_, err = db.Exec(`UPDATE "users" SET key = $1 WHERE email = $2`, key, email)
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error" : err,
-			}).Error("Insert email error")
+			log.Error("Update key error:", err)
 		}
 	}
-	return id, nil
+	return nil
 }
 
-func getAdId(number string, price string) (int,error) {
-	r := db.QueryRow(`SELECT "id" FROM "ads" WHERE "number" = $1`, number)
-	var id int
-	err := r.Scan(&id)
-	if err == sql.ErrNoRows {
-		k := db.QueryRow(`INSERT INTO ads (number, price) VALUES ($1, $2) returning id`, number, price)
-		err := k.Scan(&id)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error" : err,
-			}).Error("Insert url error")
-		}
+func insertAd(number string, price string) error {
+	_, err := db.Exec(`INSERT INTO ads (number, price) VALUES ($1, $2)`, number, price)
+	if err != nil {
+		log.Error("Insert ad error")
 	}
-	return id, nil
+	return nil
 }
 
-func getSubId(userId, numberId int) (int, error) {
-	r := db.QueryRow(`SELECT "id" FROM "subscription" WHERE "userid" = $1 AND "adid" = $2`, userId, numberId)
-	var id int
-	err := r.Scan(&id)
-	if err == sql.ErrNoRows {
-		k := db.QueryRow(`INSERT INTO subscription (userid, adid) VALUES ($1, $2) returning id`, userId, numberId)
-		err := k.Scan(&id)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error" : err,
-			}).Error("Insert subscription error")
-		}
+func insertSub(email, number string) error {
+	_, err := db.Exec(`INSERT INTO subscription (userid, adid) VALUES ((SELECT "id" FROM "users" WHERE "email" = $1),(SELECT "id" FROM "ads" WHERE "number" = $2)) returning id`, email, number)
+	if err != nil {
+		log.Error("Insert subscription error")
 	}
-	return id, nil
+	return nil
 }
 
 
 
 
 
-func SelectAds() ([]*Ad, error) {
+func SelectAds() ([]*adhandler.Ad, error) {
 	rows, err := db.Query(`SELECT * FROM "ads"`)
 	if err != nil {
-		return []*Ad{}, err
+		return []*adhandler.Ad{}, err
 	}
 	defer rows.Close()
-	ads := make([]*Ad, 0)
+	ads := make([]*adhandler.Ad, 0)
 	for rows.Next() {
-		ad := new(Ad)
+		ad := new(adhandler.Ad)
 		err := rows.Scan(&ad.Id,&ad.Number,&ad.Price)
 		if err != nil {
-			return []*Ad{}, err
+			return []*adhandler.Ad{}, err
 		}
 		ads = append(ads, ad)
 	}
@@ -127,7 +101,7 @@ func SelectAds() ([]*Ad, error) {
 func UpdatePrice(price string, id int) error {
 	_, err := db.Exec(`UPDATE "ads" SET price = $1 WHERE id = $2;`,price, id )
 	if err != nil {
-		fmt.Println(err)
+		log.Error("UpdatePrice error", err)
 	}
 	return nil
 }
@@ -135,7 +109,7 @@ func UpdatePrice(price string, id int) error {
 func GetEmails(adid int) ([]string,error) {
 	rows, err := db.Query(`SELECT u.email FROM "users" u INNER JOIN "subscription" s ON u.id = s.userid AND u.activation = true AND s.adid = $1`, adid)
 	if err != nil {
-		fmt.Println("err 2 =", err)
+		log.Error("GetEmails Query error:", err)
 		return []string{""}, nil
 	}
 	defer rows.Close()
@@ -144,7 +118,7 @@ func GetEmails(adid int) ([]string,error) {
 		var email string
 		err := rows.Scan(&email)
 		if err != nil {
-			fmt.Println("err 3 =", err)
+			log.Error("GetEmails Scan rows error:", err)
 			return []string{""}, nil
 		}
 		emails = append(emails, email)
@@ -155,7 +129,7 @@ func GetEmails(adid int) ([]string,error) {
 func UpdateActivation(key string) error {
 	_, err := db.Exec(`UPDATE "users" SET activation = true WHERE key = $1;`,key )
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 	}
 	return nil
 }

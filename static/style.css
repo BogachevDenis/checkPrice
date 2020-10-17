@@ -1,0 +1,163 @@
+@media (max-width: 5000px) {
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Epilogue', sans-serif;
+    }
+
+    .main {
+        width: 100%;
+        min-height: 100vh;
+        height: auto;
+        background: linear-gradient(0deg, #FFA900, #FFC600);
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .body {
+        text-align: center;
+        color: white;
+        box-sizing: border-box;
+        padding: 25px;
+        margin: 0 auto;
+        width: 60%;
+        min-height: 60vh;
+        height: auto;
+        background: linear-gradient(0deg, #FF7C00, #FFBA40);
+        font-size: 27px;
+        box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .createSub {
+        padding: 25px;
+        box-sizing: border-box;
+        margin: 0 auto;
+        width: 60%;
+        min-height: 40vh;
+        height: auto;
+        background: #FF7C00;
+        box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .createSub label {
+        margin-top: 10px;
+        color: white;
+        font-size: 25px;
+    }
+
+    .createSub input {
+        margin-top: 15px;
+        border: 0;
+        width: 65%;
+        height: 35px;
+        font-size: 18px;
+        border-radius: 4px;
+    }
+
+    .buttonCreateSub {
+        background: white;
+        color: #FF7C00;
+        margin-left: 20px;
+        border: 0;
+        font-size: 18px;
+        border-radius: 4px;
+        width: 25%;
+        height: 38px;
+    }
+
+    .info {
+        background: white;
+        color: white;
+        margin-top: 25px;
+        border: 0;
+        font-size: 18px;
+        border-radius: 4px;
+        width: 65%;
+        min-height: 38px;
+        height: auto;
+        display: none;
+        padding: 5px;
+    }
+}
+@media (max-width: 830px) {
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Epilogue', sans-serif;
+    }
+    h1 {
+        font-size: 18px;
+    }
+    .main {
+        width: 100%;
+        min-height: 100vh;
+        height: auto;
+        background: linear-gradient(0deg, #FFA900, #FFC600);
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .body {
+        text-align: center;
+        color: white;
+        box-sizing: border-box;
+        padding: 25px;
+        margin: 0 auto;
+        width: 80%;
+        min-height: 60vh;
+        height: auto;
+        background: linear-gradient(0deg, #FF7C00, #FFBA40);
+        font-size: 17px;
+        box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+    }
+    .createSub {
+        padding: 25px;
+        box-sizing: border-box;
+        margin: 0 auto;
+        width: 80%;
+        min-height: 40vh;
+        height: auto;
+        background: #FF7C00;
+        box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .createSub label {
+        margin-top: 10px;
+        color: white;
+        font-size: 17px;
+    }
+
+    .createSub input {
+        margin-top: 15px;
+        border: 0;
+        width: 65%;
+        height: 35px;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .buttonCreateSub {
+        background: white;
+        color: #FF7C00;
+        margin-left: 20px;
+        border: 0;
+        font-size: 15px;
+        border-radius: 4px;
+        width: 25%;
+        height: 38px;
+    }
+
+    .info {
+        background: white;
+        color: white;
+        margin-top: 25px;
+        border: 0;
+        font-size: 18px;
+        border-radius: 4px;
+        width: 65%;
+        min-height: 38px;
+        height: auto;
+        display: none;
+        padding: 5px;
+    }
+}

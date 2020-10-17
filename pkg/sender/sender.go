@@ -1,48 +1,55 @@
 package sender
 
 import (
-	"fmt"
 	"net/smtp"
+	"os"
+	log "github.com/sirupsen/logrus"
 )
 
-func SendMail(email []string, newprice, oldprice string)  {
-	fmt.Println(email,newprice,oldprice)
-	message := []byte("Hello world, new price is " + newprice + ", old price is " + oldprice)
+const (
+	senderEmail 	string = "testavitobuyer-experience@mail.ru"
+	senderPassword 	string = "buyer-experience"
+	host			string = "smtp.mail.ru"
+	addr 			string = "smtp.mail.ru:25"
+)
+
+func SendMail(email []string, number, newprice, oldprice string) {
+	message := []byte("Hello, your ad - "+ number +" changed price, new price is " + newprice + ", old price is " + oldprice)
 	auth := smtp.PlainAuth(
 		"",
-		"testavitobuyer-experience@mail.ru",
-		"buyer-experience",
-		"smtp.mail.ru",
+		senderEmail,
+		senderPassword,
+		host,
 		)
 	err := smtp.SendMail(
-		"smtp.mail.ru:25",
+		addr,
 		auth,
-		"testavitobuyer-experience@mail.ru",
+		senderEmail,
 		email,
 		message)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return
 	}
 }
 
-func SubmitEmail(email, key string) error {
-	message := []byte("Hello world, you should check this line: http://localhost:8080/"+key)
+func SubmitEmail(email, key string) {
+	confirmationUrl := os.Getenv("CONFIRMURL")
+	message := []byte("To confirm email you should run this line:" + confirmationUrl + key)
 	auth := smtp.PlainAuth(
 		"",
-		"testavitobuyer-experience@mail.ru",
-		"buyer-experience",
-		"smtp.mail.ru",
+		senderEmail,
+		senderPassword,
+		host,
 	)
 	err := smtp.SendMail(
-		"smtp.mail.ru:25",
+		addr,
 		auth,
-		"testavitobuyer-experience@mail.ru",
+		senderEmail,
 		[]string{email},
 		message)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		log.Error(err)
 	}
-	return nil
+	return
 }

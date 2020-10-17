@@ -1,30 +1,44 @@
 package worker
 
 import (
-	"fmt"
-	"github.com/checkPrice/pkg/database"
-	"github.com/checkPrice/pkg/parser"
-	"github.com/checkPrice/pkg/sender"
+	"os"
 	"time"
+	"github.com/checkPrice/pkg/database"
+	"github.com/checkPrice/pkg/sender"
+	log "github.com/sirupsen/logrus"
 )
 
 func Worker()  {
-	database.Connect("localhost","5432","postgres","1234","subsribe")
+	pgUser := os.Getenv("PG_USER")
+	pgPass := os.Getenv("PG_PASS")
+	pgBase := os.Getenv("PG_BASE")
+	err := database.Connect(pgUser,pgPass,pgBase)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error" : err,
+		}).Fatal("Connection to DB error")
+	}
 	for  {
-		ads, _ := database.SelectAds()
-		for i, _ := range ads {
-			newPrice := parser.GetPrice(ads[i].Number)
-			if (ads[i].Price != newPrice) && (newPrice != "") {
-				err := database.UpdatePrice(newPrice,ads[i].Id)
+		ads, err := database.SelectAds()
+		if err != nil {
+			log.Error(err)
+		}
+		for _, ad := range ads {
+			if ad.IsPriceChange(){
+				err := database.UpdatePrice(ad.NewPrice,ad.Id)
 				if err != nil{
-					fmt.Println("err1 = ",err)
+					log.Error(err)
 				}
-
-				emails, _ := database.GetEmails(ads[i].Id)
-				sender.SendMail(emails,newPrice,ads[i].Price)
+				emails, err := database.GetEmails(ad.Id)
+				if err != nil {
+					log.Error(err)
+				}
+				sender.SendMail(emails,ad.Number,ad.NewPrice,ad.Price)
 			}
-			fmt.Println(ads[i])
 		}
 		time.Sleep(time.Duration(10) * time.Second)
 	}
 }
+
+
+

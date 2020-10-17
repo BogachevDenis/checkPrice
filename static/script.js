@@ -16,7 +16,13 @@ function Create() {
         if(xhr.status == 200) {
             document.getElementById("info").style.display = "block";
             responseData = JSON.parse(xhr.responseText);
-            document.getElementById("info").innerHTML = (responseData.email+"|||||"+responseData.url)
+            if (responseData.error == ""){
+                document.getElementById("info").style.background = "lightgreen";
+                document.getElementById("info").innerHTML = ("Subscription was created, ad number - " + responseData.number +"<br>"+ responseData.message)
+            } else{
+                document.getElementById("info").style.background = "tomato";
+                document.getElementById("info").innerHTML = (responseData.error)
+            }
         }
     };
 }
