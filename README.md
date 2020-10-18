@@ -25,4 +25,3 @@ $ curl -X POST http://localhost:8080/create -d '{"email": "test@test.ru","url":"
 <br>
 # Принцип работы приложения:
 
-[Подписка на изменение цены](https://github.com/BogachevDenis/checkPrice/tree/main/pkg/worker)
