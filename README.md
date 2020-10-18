@@ -1,4 +1,5 @@
 # checkPrice
+Принцип работы приложения описан в файле checkPrice/structure.pdf
 # Запуск проекта:
 Для запуска проекта выполните следующие команды:
 <br>
@@ -18,10 +19,6 @@ $ docker-compose up
 Также данные можно отправить через curl:
 <br>
 $ curl -X POST http://localhost:8080/create -d '{"email": "test@test.ru","url":"https://www.avito.ru/ad"}'
-<br>
-# Принцип работы приложения:
-<br>
-Принцип работы приложения описан в файле checkPrice/structure.pdf
 <br>
 # Реализовано:
 <li> Реализовать полноценный сервис, который решает поставленную задачу
