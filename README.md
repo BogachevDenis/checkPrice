@@ -21,7 +21,7 @@ $ docker-compose up
 $ curl -X POST http://localhost:8080/create -d '{"email": "test@test.ru","url":"https://www.avito.ru/ad"}'
 <br>
 # Реализовано:
-<li> Реализовать полноценный сервис, который решает поставленную задачу
+<li> Полноценный сервис, который решает поставленную задачу
 <li> Написаны тесты 
   <br>
   (результаты:checkPrice/testout/
