@@ -23,6 +23,8 @@ $ curl -X POST http://localhost:8080/create -d '{"email": "test@test.ru","url":"
 <br>
 Принцип работы приложения описан в файле checkPrice/structure.pdf
 <br>
-# Реализовано:
-
-
+## Реализовано:
+<li> Написаны тесты
+<li> Написаны тесты
+<li> Написаны тесты
+<li> Написаны тесты
