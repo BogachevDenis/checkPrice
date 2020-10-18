@@ -18,3 +18,10 @@ $ docker-compose up
 Также данные можно отправить через curl:
 <br>
 $ curl -X POST http://localhost:8080/create -d '{"email": "test@test.ru","url":"https://www.avito.ru/ad"}'
+<br>
+# Принцип работы приложения:
+<br>
+Принцип работы приложения описан в файле checkPrice/structure.pdf 
+<br>
+# Фрагменты кода:
+[Подписка на изменение цены](https://github.com/BogachevDenis/checkPrice/tree/main/pkg/worker)
